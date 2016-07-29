@@ -60,6 +60,7 @@ define glassfish::create_node (
   $ensure           = present,
   $das_host         = undef,
   $das_port         = '4848',
+  $install          = false,
   $login            = true) {
   # Validate params
   validate_string($asadmin_user)
@@ -74,7 +75,8 @@ define glassfish::create_node (
     passwordfile => $asadmin_passfile,
     host         => $node_host,
     dashost      => $das_host,
-    dasport      => $das_port
+    dasport      => $das_port,
+    install      => $install
   }
 
 }

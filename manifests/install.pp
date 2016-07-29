@@ -59,18 +59,21 @@ class glassfish::install {
       }
     }
     'zip'     : {
+      package { 'unzip': }
+
       # Need to download glassfish from java.net
       # $glassfish_download_site = "http://download.java.net/glassfish/${glassfish::version}/release"
       $glassfish_download_site = $glassfish::download_mirror ? {
         undef   => "http://download.java.net/glassfish/${glassfish::version}/release",
         default => $glassfish::download_mirror
       }
-      $glassfish_download_file = "glassfish-${glassfish::version}.zip"
+      $glassfish_download_file = "${glassfish::package_prefix}-${glassfish::version}.zip"
       $glassfish_download_dest = "${glassfish::tmp_dir}/${glassfish_download_file}"
 
       # Work out major version for installation
       $version_arr             = split($glassfish::version, '[.]')
       $mjversion               = $version_arr[0]
+      $mnversion	       = $version_arr[1]
 
       # Make sure that $tmp_dir exists.
       file { $glassfish::tmp_dir:
@@ -79,12 +82,19 @@ class glassfish::install {
       }
 
       # Download file
-      exec { "download_${glassfish_download_file}":
-        command => "wget -q ${glassfish_download_site}/${glassfish_download_file} -O ${glassfish_download_dest}",
-        path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-        creates => $glassfish_download_dest,
-        timeout => '300',
-        require => File[$glassfish::tmp_dir]
+      #exec { "download_${glassfish_download_file}":
+      #  command => "wget -q ${glassfish_download_site}/${glassfish_download_file} -O ${glassfish_download_dest}",
+      #  path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+      #  creates => $glassfish_download_dest,
+      #  timeout => '300',
+      #  require => File[$glassfish::tmp_dir]
+      #}
+
+      file { "download_${glassfish_download_file}":
+	ensure => file,
+	path => $glassfish_download_dest,
+	source => "puppet:///modules/glassfish/${glassfish_download_file}",
+	require => File[$glassfish::tmp_dir]
       }
 
       # Unzip the downloaded glassfish zip file
@@ -93,12 +103,13 @@ class glassfish::install {
         path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
         cwd     => $glassfish::tmp_dir,
         creates => $glassfish::glassfish_dir,
-        require => Exec["download_${glassfish_download_file}"]
+      #  require => Exec["download_${glassfish_download_file}"]
+        require => [ Package['unzip'], File["download_${glassfish_download_file}"] ]
       }
 
       # Chown glassfish folder.
       exec { 'change-ownership':
-        command => "chown -R ${glassfish::user}:${glassfish::group} ${glassfish::tmp_dir}/glassfish${mjversion}",
+        command => "chown -R ${glassfish::user}:${glassfish::group} ${glassfish::tmp_dir}/${glassfish::package_prefix}${mjversion}${mnversion}",
         path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
         creates => $glassfish::glassfish_dir,
         require => Exec['unzip-downloaded']
@@ -112,7 +123,7 @@ class glassfish::install {
 
       # Chmod glassfish folder.
       exec { 'change-mode':
-        command => "chmod -R g+rwX ${glassfish::tmp_dir}/glassfish${mjversion}",
+        command => "chmod -R g+rwX ${glassfish::tmp_dir}/${glassfish::package_prefix}${mjversion}${mnversion}",
         path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
         creates => $glassfish::glassfish_dir,
         require => Exec['change-ownership']
@@ -120,7 +131,7 @@ class glassfish::install {
 
       # Move the glassfish3 folder.
       exec { "move-glassfish${mjversion}":
-        command => "mv ${glassfish::tmp_dir}/glassfish${mjversion} ${glassfish::glassfish_dir}",
+        command => "mv ${glassfish::tmp_dir}/${glassfish::package_prefix}${mjversion}${mnversion} ${glassfish::glassfish_dir}",
         path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
         cwd     => $glassfish::tmp_dir,
         creates => $glassfish::glassfish_dir,
@@ -137,6 +148,15 @@ class glassfish::install {
           require => Exec["move-glassfish${mjversion}"],
           before  => Anchor['glassfish::install::end']
         }
+	# Remove default payaradomain.
+        file { 'remove-payaradomain':
+          ensure  => absent,
+          path    => "${glassfish::glassfish_dir}/glassfish/domains/payaradomain",
+          force   => true,
+          backup  => false,
+          require => Exec["move-glassfish${mjversion}"],
+          before  => Anchor['glassfish::install::end']
+        }	 
       }
     }
     default   : {

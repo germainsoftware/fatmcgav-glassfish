@@ -18,7 +18,8 @@ Puppet::Provider::Asadmin) do
   def destroy
     args = Array.new
     args << "undeploy"
-    args << "--target" << @resource[:target]
+    args << "--target" << @resource[:target] if @resource[:target] and
+      not @resource[:target] == "domain"
     args << @resource[:name]
 
     asadmin_exec(args)

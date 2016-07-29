@@ -19,7 +19,7 @@ describe 'glassfish::install_jars' do
   let(:default_params) do
     {
       :domain_name => 'test',
-      :source      => 'puppet:///source'
+      :source      => 'source'
     }
   end
 
@@ -35,15 +35,14 @@ describe 'glassfish::install_jars' do
         'ensure' => 'directory',
         'owner'  => 'glassfish',
         'group'  => 'glassfish'
-      }) }
+      }).that_comes_before('File[/usr/local/glassfish-3.1.2.2/glassfish/lib/ext/test.jar]') }
     it { should contain_file('/usr/local/glassfish-3.1.2.2/glassfish/lib/ext/test.jar').with({
         'ensure' => 'present',
         'mode'   => '0755',
         'owner'  => 'glassfish',
         'group'  => 'glassfish',
-        'source' => 'puppet:///source'
-      }).that_requires('File[/usr/local/glassfish-3.1.2.2/glassfish/lib/ext]').
-        without_notify() }
+        'source' => 'source'
+      }).without_notify() }
   end
 
   context 'with install_location = domain' do
@@ -64,7 +63,7 @@ describe 'glassfish::install_jars' do
         'mode'   => '0755',
         'owner'  => 'glassfish',
         'group'  => 'glassfish',
-        'source' => 'puppet:///source'
+        'source' => 'source'
       }).that_notifies('Service[glassfish_test]') }
   end
 
@@ -86,7 +85,7 @@ describe 'glassfish::install_jars' do
         'mode'   => '0755',
         'owner'  => 'glassfish',
         'group'  => 'glassfish',
-        'source' => 'puppet:///source'
+        'source' => 'source'
       }).without_notify() }
   end
 
@@ -143,7 +142,7 @@ describe 'glassfish::install_jars' do
         'mode'   => '0755',
         'owner'  => 'glassfish',
         'group'  => 'glassfish',
-        'source' => 'puppet:///source'
+        'source' => 'source'
       }).that_notifies('Service[gf_service]') }
   end
 
@@ -173,7 +172,7 @@ describe 'glassfish::install_jars' do
         'mode'   => '0755',
         'owner'  => 'glassfish',
         'group'  => 'glassfish',
-        'source' => 'puppet:///source'
+        'source' => 'source'
       }).that_notifies('Service[gftest_service]') }
   end
 

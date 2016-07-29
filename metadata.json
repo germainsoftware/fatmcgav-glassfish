@@ -1,18 +1,13 @@
 {
   "name": "fatmcgav-glassfish",
+  "version": "0.7.0",
   "author": "Gavin Williams",
-  "license": "Apache-2.0",
-  "project_page": "http://github.com/fatmcgav/puppet-glassfish",
-  "source": "git://github.com/fatmcgav/puppet-glassfish.git",
-  "issue_url": "https://github.com/fatmcgav/fatmcgav-glassfish/issues/new",
   "summary": "Install and configure Glassfish J2EE application server.",
-  "version": "0.7.1",
-  "dependencies": [
-    {
-      "name": "puppetlabs-stdlib",
-      "version_requirement": ">=3.2.0 <5.0.0"
-    }
-  ],
+  "license": "Apache-2.0",
+  "source": "git://github.com/fatmcgav/puppet-glassfish.git",
+  "project_page": "http://github.com/fatmcgav/puppet-glassfish",
+  "issues_url": "https://github.com/fatmcgav/puppet-glassfish/issues",
+  "issue_url": "https://github.com/fatmcgav/fatmcgav-glassfish/issues/new",
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",
@@ -67,5 +62,8 @@
       "name": "puppet",
       "version_requirement": ">=3.0.0 <4.0.0"
     }
+  ],
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">=3.2.0"}
   ]
 }

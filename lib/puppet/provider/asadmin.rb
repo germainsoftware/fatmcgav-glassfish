@@ -71,6 +71,10 @@ class Puppet::Provider::Asadmin < Puppet::Provider
   
   protected
   
+  def prepareAssignmentArg(name, value)
+    return name + "=" + value
+  end
+  
   def hasProperties?(props)
     unless props.nil?
       return (not props.to_s.empty?)

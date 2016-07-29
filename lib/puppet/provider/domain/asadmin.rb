@@ -10,8 +10,8 @@ Puppet::Type.type(:domain).provide(:asadmin,
     args = Array.new
     args << "create-domain"
     args << "--portbase" << @resource[:portbase]
-    args << "--savelogin"
-    args << "--savemasterpassword"
+    args << "--savelogin=true"
+    args << "--savemasterpassword=true"
     args << "--template" << @resource[:template] if @resource[:template]
     args << @resource[:name]
 
